@@ -15,22 +15,32 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
   final List<Map<String, dynamic>> salas = [
     {
       "sala": "ESW 5°",
+      "turno": "Matutino",
       "horarios": ["Lab 1", "16C"]
     },
     {
       "sala": "ESW 4°",
+      "turno": "Noturno",
       "horarios": ["16C", "Lab 1"]
     },
     {
       "sala": "ESW 3°",
+      "turno": "Noturno",
       "horarios": ["Lab 6", "Lab 6"]
     },
     {
       "sala": "ESW 2° B",
+      "turno": "Matutino",
       "horarios": ["Lab 5", "14D"]
     },
     {
       "sala": "ESW 1° A",
+      "turno": "Matutino",
+      "horarios": ["Lab 4", "Lab 4"]
+    },
+    {
+      "sala": "ADS 1° A",
+      "turno": "Noturno",
       "horarios": ["Lab 4", "Lab 4"]
     },
   ];
