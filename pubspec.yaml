@@ -19,4 +19,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - images/
+    - images/logo.png
+    - images/logo_verde.png
