@@ -14,32 +14,44 @@ class TelaEnsalamento extends StatefulWidget {
 class _TelaEnsalamentoState extends State<TelaEnsalamento> {
   final List<Map<String, dynamic>> salas = [
     {
-      "sala": "ESW 5°",
+      "curso": "ESW",
+      "periodo": "5°",
+      "turma": "Único",
       "turno": "Matutino",
       "horarios": ["Lab 1", "16C"]
     },
     {
-      "sala": "ESW 4°",
+      "curso": "ESW",
+      "periodo": "4°",
+      "turma": "Único",
       "turno": "Noturno",
       "horarios": ["16C", "Lab 1"]
     },
     {
-      "sala": "ESW 3°",
+      "curso": "ESW",
+      "periodo": "3°",
+      "turma": "Único",
       "turno": "Noturno",
       "horarios": ["Lab 6", "Lab 6"]
     },
     {
-      "sala": "ESW 2° B",
+      "curso": "ESW",
+      "periodo": "2°",
+      "turma": "B",
       "turno": "Matutino",
       "horarios": ["Lab 5", "14D"]
     },
     {
-      "sala": "ESW 1° A",
+      "curso": "ESW",
+      "periodo": "1°",
+      "turma": "A",
       "turno": "Matutino",
       "horarios": ["Lab 4", "Lab 4"]
     },
     {
-      "sala": "ADS 1° A",
+      "curso": "ADS",
+      "periodo": "1°",
+      "turma": "A",
       "turno": "Noturno",
       "horarios": ["Lab 4", "Lab 4"]
     },
@@ -66,13 +78,13 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
   Widget build(BuildContext context) {
     List<String> cursosDisponiveis = [
       "Todos",
-      ...salas.map((sala) => sala["sala"] as String)
+      ...salas.map((sala) => sala["curso"] as String)
     ];
 
-    List<Map<String, dynamic>> salasFiltradas =
-        _cursoSelecionado == null || _cursoSelecionado == "Todos"
-            ? salas
-            : salas.where((sala) => sala["sala"] == _cursoSelecionado).toList();
+    List<Map<String, dynamic>> salasFiltradas = _cursoSelecionado == null ||
+            _cursoSelecionado == "Todos"
+        ? salas
+        : salas.where((sala) => sala["curso"] == _cursoSelecionado).toList();
 
     return Scaffold(
       body: Stack(
@@ -100,12 +112,16 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
               const SizedBox(height: 10),
               Expanded(
                 child: ListView(
-                  children: salasFiltradas
-                      .map((sala) => BoxCurso(
-                            title: sala["sala"],
-                            horarios: List<String>.from(sala["horarios"]),
-                          ))
-                      .toList(),
+                  children: salasFiltradas.map((sala) {
+                    String titulo = "${sala["curso"]} ${sala["periodo"]}";
+                    if (sala["turma"] != "Único") {
+                      titulo += " - ${sala["turma"]}";
+                    }
+                    return BoxCurso(
+                      title: titulo,
+                      horarios: List<String>.from(sala["horarios"]),
+                    );
+                  }).toList(),
                 ),
               ),
             ],
