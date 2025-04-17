@@ -18,64 +18,66 @@ class PesquisaCurso extends StatefulWidget {
 
 class _PesquisaCursoState extends State<PesquisaCurso> {
   final TextEditingController _controller = TextEditingController();
-  bool _mostrarFiltro = false;
+  final FocusNode _focusNode = FocusNode();
   OverlayEntry? _overlayEntry;
   List<String> _cursosFiltrados = [];
+  bool _mostrarFiltro = false;
 
   @override
   void initState() {
     super.initState();
-    _resetarCursos();
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        // Reseta o campo quando for focado
+        _controller.clear();
+        _cursosFiltrados = [];
+        _fecharFiltro();
+      }
+    });
   }
 
-  void _resetarCursos() {
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _abrirFiltroComTodosCursos() {
+    _fecharFiltro();
     setState(() {
       _cursosFiltrados = widget.cursos;
     });
-  }
-
-  void _alternarFiltro() {
-    if (_mostrarFiltro) {
-      _fecharFiltro();
-    } else {
-      _abrirFiltro();
-    }
-  }
-
-  void _abrirFiltro() {
-    if (_mostrarFiltro) return;
-
-    _overlayEntry = _criarOverlay();
-    Overlay.of(context).insert(_overlayEntry!);
-
-    setState(() {
-      _mostrarFiltro = true;
-    });
-  }
-
-  void _fecharFiltro() {
-    if (!_mostrarFiltro) return;
-
-    _overlayEntry?.remove();
-    _overlayEntry = null;
-
-    setState(() {
-      _mostrarFiltro = false;
-    });
+    _abrirFiltro();
   }
 
   void _filtrarCursos(String query) {
+    if (query.isEmpty) {
+      _fecharFiltro();
+      return;
+    }
+
     setState(() {
-      if (query.isEmpty) {
-        _cursosFiltrados = [];
-        _fecharFiltro();
-      } else {
-        _cursosFiltrados = widget.cursos
-            .where((curso) => curso.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-        _abrirFiltro();
-      }
+      _cursosFiltrados = widget.cursos
+          .where((curso) => curso.toLowerCase().contains(query.toLowerCase()))
+          .toList();
     });
+
+    _abrirFiltro();
+  }
+
+  void _abrirFiltro() {
+    if (_overlayEntry != null) return;
+
+    _overlayEntry = _criarOverlay();
+    Overlay.of(context).insert(_overlayEntry!);
+    _mostrarFiltro = true;
+  }
+
+  void _fecharFiltro() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    _mostrarFiltro = false;
   }
 
   OverlayEntry _criarOverlay() {
@@ -92,27 +94,25 @@ class _PesquisaCursoState extends State<PesquisaCurso> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: _cursosFiltrados.isNotEmpty
-                  ? _cursosFiltrados.map((curso) {
+            child: _cursosFiltrados.isNotEmpty
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: _cursosFiltrados.map((curso) {
                       return ListTile(
                         title: Text(curso),
                         onTap: () {
-                          String? selecionado = curso == "Todos" ? null : curso;
-                          widget.onCursoSelecionado(selecionado);
-                          _controller.text = selecionado ?? "";
+                          widget.onCursoSelecionado(
+                              curso == "Todos" ? null : curso);
+                          _controller.text = curso;
                           _fecharFiltro();
                         },
                       );
-                    }).toList()
-                  : [
-                      const Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: Text("Nenhum curso encontrado"),
-                      )
-                    ],
-            ),
+                    }).toList(),
+                  )
+                : const Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: Text("Nenhum curso encontrado"),
+                  ),
           ),
         ),
       ),
@@ -127,6 +127,7 @@ class _PesquisaCursoState extends State<PesquisaCurso> {
           children: [
             Expanded(
               child: TextField(
+                focusNode: _focusNode,
                 controller: _controller,
                 decoration: InputDecoration(
                   hintText: "Buscar curso...",
@@ -141,7 +142,7 @@ class _PesquisaCursoState extends State<PesquisaCurso> {
             ),
             IconButton(
               icon: const Icon(Icons.filter_list),
-              onPressed: _alternarFiltro,
+              onPressed: _abrirFiltroComTodosCursos,
             ),
           ],
         ),

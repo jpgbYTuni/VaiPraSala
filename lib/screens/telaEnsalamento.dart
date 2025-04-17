@@ -57,7 +57,7 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
     },
   ];
 
-  String? _cursoSelecionado;
+  String _cursoSelecionado = "Todos";
   String _nomeUsuario = "Carregando...";
   bool _mostrarFiltro = false;
 
@@ -78,11 +78,10 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
   Widget build(BuildContext context) {
     List<String> cursosDisponiveis = [
       "Todos",
-      ...salas.map((sala) => sala["curso"] as String)
+      ...{...salas.map((sala) => sala["curso"] as String)}
     ];
 
-    List<Map<String, dynamic>> salasFiltradas = _cursoSelecionado == null ||
-            _cursoSelecionado == "Todos"
+    List<Map<String, dynamic>> salasFiltradas = _cursoSelecionado == "Todos"
         ? salas
         : salas.where((sala) => sala["curso"] == _cursoSelecionado).toList();
 
@@ -99,7 +98,7 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
                   cursos: cursosDisponiveis,
                   onCursoSelecionado: (curso) {
                     setState(() {
-                      _cursoSelecionado = curso == "Todos" ? null : curso;
+                      _cursoSelecionado = curso ?? "Todos";
                     });
                   },
                   onAbrirFiltro: () {
@@ -136,7 +135,7 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
                   });
                 },
                 child: Container(
-                  color: Colors.black,
+                  color: Colors.black54,
                   child: Center(
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
@@ -153,8 +152,7 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
                             title: Text(curso),
                             onTap: () {
                               setState(() {
-                                _cursoSelecionado =
-                                    curso == "Todos" ? null : curso;
+                                _cursoSelecionado = curso;
                                 _mostrarFiltro = false;
                               });
                             },

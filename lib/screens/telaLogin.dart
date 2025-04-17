@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/customTextField.dart';
 import '../widgets/loginButton.dart';
+import '../widgets/loginButtonInfra.dart';
 import 'telaEnsalamento.dart';
 import 'telaInfra.dart';
 
@@ -95,36 +96,47 @@ class _TelaLoginState extends State<TelaLogin> {
                       ],
                     ),
                     child: Card(
-                      color: cardColor,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                            child: CustomTextField(
-                              label: 'Nome',
-                              isNumeric: false,
-                              controller: nomeController,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 400),
+                        curve: Curves.easeInOut,
+                        decoration: BoxDecoration(
+                          color: cardColor,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                              child: CustomTextField(
+                                label: 'Nome',
+                                isNumeric: false,
+                                controller: nomeController,
+                              ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                            child: CustomTextField(
-                              label: 'Código',
-                              isNumeric: true,
-                              controller: codigoController,
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                              child: CustomTextField(
+                                label: 'Código',
+                                isNumeric: true,
+                                controller: codigoController,
+                              ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Button(
-                              text: 'Login',
-                              buttonWidth: 100,
-                              buttonHeight: 30,
-                              buttonColor: buttonColor,
-                              onPressed: _realizarLogin,
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: ButtonLogin(
+                                text: 'Login',
+                                buttonWidth: 100,
+                                buttonHeight: 30,
+                                buttonColor: buttonColor,
+                                onPressed: _realizarLogin,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -148,8 +160,8 @@ class _TelaLoginState extends State<TelaLogin> {
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.only(bottom: 10),
-              child: Button(
-                text: 'Infra',
+              child: ButtonInfra(
+                text: modoInfra ? 'Voltar' : 'Infra',
                 buttonWidth: 100,
                 buttonHeight: 30,
                 buttonColor: botaoInfra,

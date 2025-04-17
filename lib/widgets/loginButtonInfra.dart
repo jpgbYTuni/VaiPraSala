@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class ButtonLogin extends StatelessWidget {
+class ButtonInfra extends StatelessWidget {
   final String text;
   final double buttonWidth;
   final double buttonHeight;
   final VoidCallback onPressed;
   final Color buttonColor;
 
-  const ButtonLogin({
+  const ButtonInfra({
     super.key,
     required this.text,
     required this.buttonWidth,
@@ -27,7 +27,7 @@ class ButtonLogin extends StatelessWidget {
       child: Text(
         text,
         style: const TextStyle(
-          color: Color(0xffe7972a),
+          color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
       ),
