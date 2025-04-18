@@ -28,7 +28,6 @@ class _PesquisaCursoState extends State<PesquisaCurso> {
     super.initState();
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
-        // Reseta o campo quando for focado
         _controller.clear();
         _cursosFiltrados = [];
         _fecharFiltro();

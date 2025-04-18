@@ -76,9 +76,15 @@ class _TelaLoginState extends State<TelaLogin> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  modoInfra ? 'images/logo_verde.png' : 'images/logo.png',
-                  width: 350,
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  switchInCurve: Curves.easeIn,
+                  switchOutCurve: Curves.easeOut,
+                  child: Image.asset(
+                    modoInfra ? 'images/logo_verde.png' : 'images/logo.png',
+                    key: ValueKey<bool>(modoInfra),
+                    width: 350,
+                  ),
                 ),
                 const SizedBox(height: 40),
                 Padding(
@@ -148,11 +154,17 @@ class _TelaLoginState extends State<TelaLogin> {
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.only(bottom: 60),
-              child: Image.network(
-                'https://unicv.edu.br/wp-content/uploads/2020/12/logo-verde-280X100.png',
-                width: 150,
-                height: 50,
-                fit: BoxFit.contain,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 500),
+                switchInCurve: Curves.easeIn,
+                switchOutCurve: Curves.easeOut,
+                child: Image.network(
+                  'https://unicv.edu.br/wp-content/uploads/2020/12/logo-verde-280X100.png',
+                  width: 150,
+                  height: 50,
+                  fit: BoxFit.contain,
+                  key: ValueKey<bool>(modoInfra),
+                ),
               ),
             ),
           ),
