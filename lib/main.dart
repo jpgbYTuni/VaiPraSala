@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
-import 'screens/telaLogin.dart';
-import 'screens/telaEnsalamento.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'screens/tela_login.dart';
+import 'screens/tela_ensalamento.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://jlhrwonklbszqyskwjwt.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpsaHJ3b25rbGJzenF5c2t3and0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNTQ3ODcsImV4cCI6MjA2MDgzMDc4N30.rt7Me5D4hzhGZHai8fn6H-khRv2cWV7LDOhrs8m__Es',
+  );
+
   runApp(const MainApp());
 }
 

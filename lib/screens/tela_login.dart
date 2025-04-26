@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../widgets/customTextField.dart';
-import '../widgets/loginButton.dart';
-import '../widgets/loginButtonInfra.dart';
-import 'telaEnsalamento.dart';
-import 'telaInfra.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../widgets/custom_text_field.dart';
+import '../widgets/login_button.dart';
+import '../widgets/login_button_infra.dart';
+import 'tela_ensalamento.dart';
+import 'tela_infra.dart';
 
 class TelaLogin extends StatefulWidget {
   const TelaLogin({super.key});
@@ -18,36 +19,76 @@ class _TelaLoginState extends State<TelaLogin> {
   final TextEditingController codigoController = TextEditingController();
   bool modoInfra = false;
 
+  final supabase = Supabase.instance.client;
+
   Future<void> _salvarNome(String nome) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('nomeUsuario', nome);
   }
 
-  void _realizarLogin() {
+  Future<void> _realizarLogin() async {
     String nome = nomeController.text.trim();
-    String codigo = codigoController.text.trim();
+    String codigoTexto = codigoController.text.trim();
 
-    if (nome.isNotEmpty && codigo.isNotEmpty) {
-      _salvarNome(nome);
-      if (modoInfra) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Telainfra()),
-        );
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const TelaEnsalamento()),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Preencha todos os campos para continuar!'),
-          backgroundColor: Colors.red,
-        ),
-      );
+    if (nome.isEmpty || codigoTexto.isEmpty) {
+      _mostrarErro("Preencha todos os campos!");
+      return;
     }
+
+    int? codigo = int.tryParse(codigoTexto);
+    if (codigo == null) {
+      _mostrarErro("Código inválido.");
+      return;
+    }
+
+    try {
+      final response = await supabase
+          .from('Usuarios')
+          .select()
+          .eq('Codigo', codigo)
+          .maybeSingle();
+
+      if (response == null) {
+        _mostrarErro("Código não encontrado.");
+        return;
+      }
+
+      final tipo = response['Tipo'];
+      final nomeBanco = response['Nome'];
+
+      if (modoInfra) {
+        if (tipo == 'Infra') {
+          await _salvarNome(nomeBanco);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const Telainfra()),
+          );
+        } else {
+          _mostrarErro("Código inválido para login Infra.");
+        }
+      } else {
+        if (tipo == 'Aluno' || tipo == 'Professor') {
+          await _salvarNome(nomeBanco);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const TelaEnsalamento()),
+          );
+        } else {
+          _mostrarErro("Código não permitido nesta tela.");
+        }
+      }
+    } catch (e) {
+      _mostrarErro("Erro ao acessar o banco: ${e.toString()}");
+    }
+  }
+
+  void _mostrarErro(String mensagem) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensagem),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   void _alternarModoInfra() {
@@ -78,8 +119,6 @@ class _TelaLoginState extends State<TelaLogin> {
               children: [
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 500),
-                  switchInCurve: Curves.easeIn,
-                  switchOutCurve: Curves.easeOut,
                   child: Image.asset(
                     modoInfra ? 'images/logo_verde.png' : 'images/logo.png',
                     key: ValueKey<bool>(modoInfra),
@@ -118,7 +157,7 @@ class _TelaLoginState extends State<TelaLogin> {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                               child: CustomTextField(
-                                label: 'Nome',
+                                label: 'Nome (P/ Professores Opcional)',
                                 isNumeric: false,
                                 controller: nomeController,
                               ),
@@ -156,8 +195,6 @@ class _TelaLoginState extends State<TelaLogin> {
               padding: const EdgeInsets.only(bottom: 60),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 500),
-                switchInCurve: Curves.easeIn,
-                switchOutCurve: Curves.easeOut,
                 child: Image.network(
                   'https://unicv.edu.br/wp-content/uploads/2020/12/logo-verde-280X100.png',
                   width: 150,

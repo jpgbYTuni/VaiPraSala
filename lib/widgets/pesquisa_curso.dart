@@ -21,7 +21,6 @@ class _PesquisaCursoState extends State<PesquisaCurso> {
   final FocusNode _focusNode = FocusNode();
   OverlayEntry? _overlayEntry;
   List<String> _cursosFiltrados = [];
-  bool _mostrarFiltro = false;
 
   @override
   void initState() {
@@ -70,13 +69,11 @@ class _PesquisaCursoState extends State<PesquisaCurso> {
 
     _overlayEntry = _criarOverlay();
     Overlay.of(context).insert(_overlayEntry!);
-    _mostrarFiltro = true;
   }
 
   void _fecharFiltro() {
     _overlayEntry?.remove();
     _overlayEntry = null;
-    _mostrarFiltro = false;
   }
 
   OverlayEntry _criarOverlay() {

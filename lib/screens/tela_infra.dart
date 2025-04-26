@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../widgets/boxCurso.dart';
-import '../widgets/pesquisaCurso.dart';
-import '../widgets/headerEnsalamento.dart';
+import '../widgets/box_curso.dart';
+import '../widgets/pesquisa_curso.dart';
+import '../widgets/header_ensalamento.dart';
 
-class TelaEnsalamento extends StatefulWidget {
-  const TelaEnsalamento({Key? key}) : super(key: key);
+class Telainfra extends StatefulWidget {
+  const Telainfra({Key? key}) : super(key: key);
 
   @override
-  _TelaEnsalamentoState createState() => _TelaEnsalamentoState();
+  _TelaInfraState createState() => _TelaInfraState();
 }
 
-class _TelaEnsalamentoState extends State<TelaEnsalamento> {
+class _TelaInfraState extends State<Telainfra> {
   final List<Map<String, dynamic>> salas = [
     {
       "curso": "ESW",
@@ -57,7 +57,7 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
     },
   ];
 
-  String _cursoSelecionado = "Todos";
+  String? _cursoSelecionado;
   String _nomeUsuario = "Carregando...";
   bool _mostrarFiltro = false;
 
@@ -78,14 +78,16 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
   Widget build(BuildContext context) {
     List<String> cursosDisponiveis = [
       "Todos",
-      ...{...salas.map((sala) => sala["curso"] as String)}
+      ...salas.map((sala) => sala["curso"] as String)
     ];
 
-    List<Map<String, dynamic>> salasFiltradas = _cursoSelecionado == "Todos"
+    List<Map<String, dynamic>> salasFiltradas = _cursoSelecionado == null ||
+            _cursoSelecionado == "Todos"
         ? salas
         : salas.where((sala) => sala["curso"] == _cursoSelecionado).toList();
 
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
           Column(
@@ -98,7 +100,7 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
                   cursos: cursosDisponiveis,
                   onCursoSelecionado: (curso) {
                     setState(() {
-                      _cursoSelecionado = curso ?? "Todos";
+                      _cursoSelecionado = curso == "Todos" ? null : curso;
                     });
                   },
                   onAbrirFiltro: () {
@@ -135,7 +137,7 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
                   });
                 },
                 child: Container(
-                  color: Colors.black54,
+                  color: Colors.black,
                   child: Center(
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
@@ -152,7 +154,8 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
                             title: Text(curso),
                             onTap: () {
                               setState(() {
-                                _cursoSelecionado = curso;
+                                _cursoSelecionado =
+                                    curso == "Todos" ? null : curso;
                                 _mostrarFiltro = false;
                               });
                             },
