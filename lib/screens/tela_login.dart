@@ -30,8 +30,8 @@ class _TelaLoginState extends State<TelaLogin> {
     String nome = nomeController.text.trim();
     String codigoTexto = codigoController.text.trim();
 
-    if (nome.isEmpty || codigoTexto.isEmpty) {
-      _mostrarErro("Preencha todos os campos!");
+    if (codigoTexto.isEmpty) {
+      _mostrarErro("Preencha o código!");
       return;
     }
 
@@ -58,6 +58,10 @@ class _TelaLoginState extends State<TelaLogin> {
 
       if (modoInfra) {
         if (tipo == 'Infra') {
+          if (nome.isEmpty) {
+            _mostrarErro("Preencha o nome!");
+            return;
+          }
           await _salvarNome(nomeBanco);
           Navigator.pushReplacement(
             context,
@@ -67,7 +71,18 @@ class _TelaLoginState extends State<TelaLogin> {
           _mostrarErro("Código inválido para login Infra.");
         }
       } else {
-        if (tipo == 'Aluno' || tipo == 'Professor') {
+        if (tipo == 'Aluno') {
+          if (nome.isEmpty) {
+            _mostrarErro("Preencha o nome!");
+            return;
+          }
+          await _salvarNome(nome);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const TelaEnsalamento()),
+          );
+        } else if (tipo == 'Professor') {
+          // Nome opcional para professor
           await _salvarNome(nomeBanco);
           Navigator.pushReplacement(
             context,
@@ -157,7 +172,9 @@ class _TelaLoginState extends State<TelaLogin> {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                               child: CustomTextField(
-                                label: 'Nome (P/ Professores Opcional)',
+                                label: modoInfra
+                                    ? 'Nome'
+                                    : 'Nome (P/ Professores Opcional)',
                                 isNumeric: false,
                                 controller: nomeController,
                               ),
