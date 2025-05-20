@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vaiprasala/screens/tela_ensalamento.dart';
 import 'screens/tela_login.dart';
-import 'screens/tela_ensalamento.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +22,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: TelaLogin(),
+      home: TelaEnsalamento(),
     );
   }
 }

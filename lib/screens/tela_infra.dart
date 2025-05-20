@@ -5,7 +5,7 @@ import '../widgets/pesquisa_curso.dart';
 import '../widgets/header_ensalamento.dart';
 
 class Telainfra extends StatefulWidget {
-  const Telainfra({Key? key}) : super(key: key);
+  const Telainfra({super.key});
 
   @override
   _TelaInfraState createState() => _TelaInfraState();

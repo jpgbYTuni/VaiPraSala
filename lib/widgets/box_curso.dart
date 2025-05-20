@@ -5,16 +5,17 @@ class BoxCurso extends StatefulWidget {
   final List<String> horarios;
 
   const BoxCurso({
-    Key? key,
+    super.key,
     required this.title,
     required this.horarios,
-  }) : super(key: key);
+  });
 
   @override
   _BoxCursoState createState() => _BoxCursoState();
 }
 
-class _BoxCursoState extends State<BoxCurso> {
+class _BoxCursoState extends State<BoxCurso>
+    with SingleTickerProviderStateMixin {
   bool _isExpanded = false;
 
   @override
@@ -22,7 +23,7 @@ class _BoxCursoState extends State<BoxCurso> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
       decoration: BoxDecoration(
-        color: Color(0xff7ecd73),
+        color: const Color(0xff7ecd73),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -46,57 +47,67 @@ class _BoxCursoState extends State<BoxCurso> {
                       fontWeight: FontWeight.w900,
                     ),
                   ),
-                  Icon(
-                    _isExpanded
-                        ? Icons.expand_more_outlined
-                        : Icons.chevron_right_outlined,
-                    size: 40,
-                    color: Color(0xff51703C),
+                  AnimatedRotation(
+                    turns: _isExpanded ? 0.5 : 0.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: const Icon(
+                      Icons.expand_more_outlined,
+                      size: 40,
+                      color: Color(0xff51703C),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-          if (_isExpanded)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              child: Column(
-                children: List.generate(widget.horarios.length, (index) {
-                  return Column(
-                    children: [
-                      Text(
-                        "${index + 1}° Horário",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: ConstrainedBox(
+              constraints: _isExpanded
+                  ? const BoxConstraints()
+                  : const BoxConstraints(maxHeight: 0),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                child: Column(
+                  children: List.generate(widget.horarios.length, (index) {
+                    return Column(
+                      children: [
+                        Text(
+                          "${index + 1}° Horário",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Center(
-                          child: Text(
-                            widget.horarios[index],
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                              fontWeight: FontWeight.normal,
+                        const SizedBox(height: 4),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Center(
+                            child: Text(
+                              widget.horarios[index],
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                  );
-                }),
+                        const SizedBox(height: 10),
+                      ],
+                    );
+                  }),
+                ),
               ),
             ),
+          ),
         ],
       ),
     );

@@ -6,11 +6,11 @@ class PesquisaCurso extends StatefulWidget {
   final VoidCallback onAbrirFiltro;
 
   const PesquisaCurso({
-    Key? key,
+    super.key,
     required this.cursos,
     required this.onCursoSelecionado,
     required this.onAbrirFiltro,
-  }) : super(key: key);
+  });
 
   @override
   _PesquisaCursoState createState() => _PesquisaCursoState();

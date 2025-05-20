@@ -62,7 +62,7 @@ class _TelaLoginState extends State<TelaLogin> {
             _mostrarErro("Preencha o nome!");
             return;
           }
-          await _salvarNome(nomeBanco);
+          await _salvarNome(nomeBanco); // Infra sempre usa o nome do banco
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const Telainfra()),
@@ -72,17 +72,14 @@ class _TelaLoginState extends State<TelaLogin> {
         }
       } else {
         if (tipo == 'Aluno') {
-          if (nome.isEmpty) {
-            _mostrarErro("Preencha o nome!");
-            return;
-          }
-          await _salvarNome(nome);
+          final nomeFinal = nome.isNotEmpty ? nome : nomeBanco;
+          await _salvarNome(nomeFinal);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const TelaEnsalamento()),
           );
         } else if (tipo == 'Professor') {
-          // Nome opcional para professor
+          // Professor sempre usa nome do banco
           await _salvarNome(nomeBanco);
           Navigator.pushReplacement(
             context,
@@ -109,6 +106,8 @@ class _TelaLoginState extends State<TelaLogin> {
   void _alternarModoInfra() {
     setState(() {
       modoInfra = !modoInfra;
+      nomeController.clear(); // Limpa campo ao alternar
+      codigoController.clear();
     });
   }
 
@@ -133,7 +132,7 @@ class _TelaLoginState extends State<TelaLogin> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 500),
+                  duration: const Duration(milliseconds: 100),
                   child: Image.asset(
                     modoInfra ? 'images/logo_verde.png' : 'images/logo.png',
                     key: ValueKey<bool>(modoInfra),
@@ -173,8 +172,8 @@ class _TelaLoginState extends State<TelaLogin> {
                               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                               child: CustomTextField(
                                 label: modoInfra
-                                    ? 'Nome'
-                                    : 'Nome (P/ Professores Opcional)',
+                                    ? 'Nome (Obrigatório)'
+                                    : 'Nome (Opcional)',
                                 isNumeric: false,
                                 controller: nomeController,
                               ),
