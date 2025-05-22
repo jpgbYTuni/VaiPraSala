@@ -87,7 +87,7 @@ class _TelaInfraState extends State<Telainfra> {
         : salas.where((sala) => sala["curso"] == _cursoSelecionado).toList();
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color.fromARGB(255, 199, 199, 199),
       body: Stack(
         children: [
           Column(

@@ -35,6 +35,11 @@ class _TelaLoginState extends State<TelaLogin> {
       return;
     }
 
+    if (modoInfra && nome.isEmpty) {
+      _mostrarErro("Preencha o RA!");
+      return;
+    }
+
     int? codigo = int.tryParse(codigoTexto);
     if (codigo == null) {
       _mostrarErro("Código inválido.");
@@ -58,11 +63,17 @@ class _TelaLoginState extends State<TelaLogin> {
 
       if (modoInfra) {
         if (tipo == 'Infra') {
-          if (nome.isEmpty) {
-            _mostrarErro("Preencha o nome!");
+          final raBanco = response['RA'] ?? '';
+
+          String raDigitado = nome.replaceAll('-', '').toLowerCase();
+          String raSalvo = raBanco.toString().replaceAll('-', '').toLowerCase();
+
+          if (raDigitado != raSalvo) {
+            _mostrarErro("RA inválido para esse código.");
             return;
           }
-          await _salvarNome(nomeBanco); // Infra sempre usa o nome do banco
+
+          await _salvarNome(nomeBanco);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const Telainfra()),
@@ -79,7 +90,6 @@ class _TelaLoginState extends State<TelaLogin> {
             MaterialPageRoute(builder: (context) => const TelaEnsalamento()),
           );
         } else if (tipo == 'Professor') {
-          // Professor sempre usa nome do banco
           await _salvarNome(nomeBanco);
           Navigator.pushReplacement(
             context,
@@ -106,7 +116,7 @@ class _TelaLoginState extends State<TelaLogin> {
   void _alternarModoInfra() {
     setState(() {
       modoInfra = !modoInfra;
-      nomeController.clear(); // Limpa campo ao alternar
+      nomeController.clear();
       codigoController.clear();
     });
   }
@@ -171,9 +181,7 @@ class _TelaLoginState extends State<TelaLogin> {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                               child: CustomTextField(
-                                label: modoInfra
-                                    ? 'Nome (Obrigatório)'
-                                    : 'Nome (Opcional)',
+                                label: modoInfra ? 'RA' : 'Nome (Opcional)',
                                 isNumeric: false,
                                 controller: nomeController,
                               ),
@@ -181,7 +189,8 @@ class _TelaLoginState extends State<TelaLogin> {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                               child: CustomTextField(
-                                label: 'Código',
+                                label:
+                                    modoInfra ? 'Código de Acesso' : 'Código',
                                 isNumeric: true,
                                 controller: codigoController,
                               ),
