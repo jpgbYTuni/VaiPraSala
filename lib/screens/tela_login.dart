@@ -149,6 +149,15 @@ class _TelaLoginState extends State<TelaLogin> {
                     width: 350,
                   ),
                 ),
+                Text(
+                  modoInfra ? 'INFRA' : ' ',
+                  style: TextStyle(
+                      color: modoInfra
+                          ? const Color(0xff51703C)
+                          : const Color(0xffe7972a),
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 40),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -189,8 +198,9 @@ class _TelaLoginState extends State<TelaLogin> {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                               child: CustomTextField(
-                                label:
-                                    modoInfra ? 'Código de Acesso' : 'Código',
+                                label: modoInfra
+                                    ? 'Código de Acesso'
+                                    : 'Código de Acesso',
                                 isNumeric: true,
                                 controller: codigoController,
                               ),
