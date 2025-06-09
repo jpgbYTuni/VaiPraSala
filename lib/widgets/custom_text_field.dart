@@ -5,12 +5,18 @@ class CustomTextField extends StatelessWidget {
   final String label;
   final bool isNumeric;
   final TextEditingController? controller;
+  final FocusNode? focusNode;
+  final TextInputAction? textInputAction;
+  final void Function(String)? onSubmitted;
 
   const CustomTextField({
     super.key,
     required this.label,
     this.isNumeric = false,
     this.controller,
+    this.focusNode,
+    this.textInputAction,
+    this.onSubmitted,
   });
 
   @override
@@ -34,6 +40,9 @@ class CustomTextField extends StatelessWidget {
           keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
           inputFormatters:
               isNumeric ? [FilteringTextInputFormatter.digitsOnly] : [],
+          focusNode: focusNode,
+          textInputAction: textInputAction,
+          onSubmitted: onSubmitted,
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,

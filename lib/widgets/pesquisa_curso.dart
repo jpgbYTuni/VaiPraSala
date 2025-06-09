@@ -78,38 +78,51 @@ class _PesquisaCursoState extends State<PesquisaCurso> {
 
   OverlayEntry _criarOverlay() {
     return OverlayEntry(
-      builder: (context) => Positioned(
-        top: 140,
-        left: 20,
-        right: 20,
-        child: Material(
-          elevation: 8,
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: _cursosFiltrados.isNotEmpty
-                ? Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: _cursosFiltrados.map((curso) {
-                      return ListTile(
-                        title: Text(curso),
-                        onTap: () {
-                          widget.onCursoSelecionado(
-                              curso == "Todos" ? null : curso);
-                          _controller.text = curso;
-                          _fecharFiltro();
-                        },
-                      );
-                    }).toList(),
-                  )
-                : const Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Text("Nenhum curso encontrado"),
+      builder: (context) => GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () {
+          _fecharFiltro(); // Fecha ao clicar fora
+        },
+        child: Stack(
+          children: [
+            Positioned(
+              top: 140,
+              left: 20,
+              right: 20,
+              child: GestureDetector(
+                onTap: () {}, // Impede o fechamento ao clicar dentro
+                child: Material(
+                  elevation: 8,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: _cursosFiltrados.isNotEmpty
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: _cursosFiltrados.map((curso) {
+                              return ListTile(
+                                title: Text(curso),
+                                onTap: () {
+                                  widget.onCursoSelecionado(
+                                      curso == "Todos" ? null : curso);
+                                  _controller.text = curso;
+                                  _fecharFiltro();
+                                },
+                              );
+                            }).toList(),
+                          )
+                        : const Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: Text("Nenhum curso encontrado"),
+                          ),
                   ),
-          ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

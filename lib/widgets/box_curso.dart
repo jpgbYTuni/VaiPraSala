@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class BoxCurso extends StatefulWidget {
   final String title;
-  final List<String> horarios;
+  final List<String> cursos;
 
   const BoxCurso({
     super.key,
     required this.title,
-    required this.horarios,
+    required this.cursos,
   });
 
   @override
@@ -71,11 +71,11 @@ class _BoxCursoState extends State<BoxCurso>
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 child: Column(
-                  children: List.generate(widget.horarios.length, (index) {
+                  children: List.generate(widget.cursos.length, (index) {
                     return Column(
                       children: [
                         Text(
-                          "${index + 1}° Horário",
+                          "${index + 1}ª Turma",
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -92,7 +92,7 @@ class _BoxCursoState extends State<BoxCurso>
                           ),
                           child: Center(
                             child: Text(
-                              widget.horarios[index],
+                              widget.cursos[index],
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 20,

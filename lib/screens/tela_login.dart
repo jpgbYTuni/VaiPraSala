@@ -17,13 +17,16 @@ class TelaLogin extends StatefulWidget {
 class _TelaLoginState extends State<TelaLogin> {
   final TextEditingController nomeController = TextEditingController();
   final TextEditingController codigoController = TextEditingController();
+  final FocusNode nomeFocusNode = FocusNode();
+  final FocusNode codigoFocusNode = FocusNode();
   bool modoInfra = false;
 
   final supabase = Supabase.instance.client;
 
-  Future<void> _salvarNome(String nome) async {
+  Future<void> _salvarDadosUsuario(String nome, String tipo) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('nomeUsuario', nome);
+    await prefs.setString('tipoUsuario', tipo);
   }
 
   Future<void> _realizarLogin() async {
@@ -64,7 +67,6 @@ class _TelaLoginState extends State<TelaLogin> {
       if (modoInfra) {
         if (tipo == 'Infra') {
           final raBanco = response['RA'] ?? '';
-
           String raDigitado = nome.replaceAll('-', '').toLowerCase();
           String raSalvo = raBanco.toString().replaceAll('-', '').toLowerCase();
 
@@ -73,7 +75,7 @@ class _TelaLoginState extends State<TelaLogin> {
             return;
           }
 
-          await _salvarNome(nomeBanco);
+          await _salvarDadosUsuario(nomeBanco, tipo);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const Telainfra()),
@@ -84,13 +86,13 @@ class _TelaLoginState extends State<TelaLogin> {
       } else {
         if (tipo == 'Aluno') {
           final nomeFinal = nome.isNotEmpty ? nome : nomeBanco;
-          await _salvarNome(nomeFinal);
+          await _salvarDadosUsuario(nomeFinal, tipo);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const TelaEnsalamento()),
           );
         } else if (tipo == 'Professor') {
-          await _salvarNome(nomeBanco);
+          await _salvarDadosUsuario(nomeBanco, tipo);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const TelaEnsalamento()),
@@ -106,10 +108,7 @@ class _TelaLoginState extends State<TelaLogin> {
 
   void _mostrarErro(String mensagem) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(mensagem), backgroundColor: Colors.red),
     );
   }
 
@@ -135,125 +134,113 @@ class _TelaLoginState extends State<TelaLogin> {
 
     return Scaffold(
       backgroundColor: fundoCor,
-      body: Stack(
-        children: [
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 100),
-                  child: Image.asset(
-                    modoInfra ? 'images/logo_verde.png' : 'images/logo.png',
-                    key: ValueKey<bool>(modoInfra),
-                    width: 350,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 100),
+              child: Image.asset(
+                modoInfra ? 'images/logo_verde.png' : 'images/logo.png',
+                key: ValueKey<bool>(modoInfra),
+                width: 350,
+              ),
+            ),
+            Text(
+              modoInfra ? 'INFRA' : ' ',
+              style: TextStyle(
+                color: modoInfra
+                    ? const Color(0xff51703C)
+                    : const Color(0xffe7972a),
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 40),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 500),
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      offset: const Offset(20, 20),
+                      color: sombraLogin,
+                      blurRadius: 40.0,
+                      spreadRadius: 0.005,
+                    ),
+                  ],
+                ),
+                child: Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                ),
-                Text(
-                  modoInfra ? 'INFRA' : ' ',
-                  style: TextStyle(
-                      color: modoInfra
-                          ? const Color(0xff51703C)
-                          : const Color(0xffe7972a),
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 40),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Container(
-                    constraints: const BoxConstraints(maxWidth: 500),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeInOut,
                     decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          offset: const Offset(20, 20),
-                          color: sombraLogin,
-                          blurRadius: 40.0,
-                          spreadRadius: 0.005,
+                      color: cardColor,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                          child: CustomTextField(
+                            label: modoInfra ? 'RA' : 'Nome (Opcional)',
+                            isNumeric: false,
+                            controller: nomeController,
+                            focusNode: nomeFocusNode,
+                            textInputAction: TextInputAction.next,
+                            onSubmitted: (_) {
+                              FocusScope.of(context)
+                                  .requestFocus(codigoFocusNode);
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                          child: CustomTextField(
+                            label: 'Código de Acesso',
+                            isNumeric: true,
+                            controller: codigoController,
+                            focusNode: codigoFocusNode,
+                            textInputAction: TextInputAction.done,
+                            onSubmitted: (_) => _realizarLogin(),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: ButtonLogin(
+                            text: 'Login',
+                            buttonWidth: 100,
+                            buttonHeight: 30,
+                            buttonColor: buttonColor,
+                            onPressed: _realizarLogin,
+                          ),
                         ),
                       ],
                     ),
-                    child: Card(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 400),
-                        curve: Curves.easeInOut,
-                        decoration: BoxDecoration(
-                          color: cardColor,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                              child: CustomTextField(
-                                label: modoInfra ? 'RA' : 'Nome (Opcional)',
-                                isNumeric: false,
-                                controller: nomeController,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                              child: CustomTextField(
-                                label: modoInfra
-                                    ? 'Código de Acesso'
-                                    : 'Código de Acesso',
-                                isNumeric: true,
-                                controller: codigoController,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
-                              child: ButtonLogin(
-                                text: 'Login',
-                                buttonWidth: 100,
-                                buttonHeight: 30,
-                                buttonColor: buttonColor,
-                                onPressed: _realizarLogin,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 60),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                child: Image.network(
-                  'https://unicv.edu.br/wp-content/uploads/2020/12/logo-verde-280X100.png',
-                  width: 150,
-                  height: 50,
-                  fit: BoxFit.contain,
-                  key: ValueKey<bool>(modoInfra),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 30, 0, 10),
+                child: ButtonInfra(
+                  text: modoInfra ? 'Voltar' : 'Infra',
+                  buttonWidth: 100,
+                  buttonHeight: 30,
+                  buttonColor: botaoInfra,
+                  onPressed: _alternarModoInfra,
                 ),
               ),
             ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: ButtonInfra(
-                text: modoInfra ? 'Voltar' : 'Infra',
-                buttonWidth: 100,
-                buttonHeight: 30,
-                buttonColor: botaoInfra,
-                onPressed: _alternarModoInfra,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

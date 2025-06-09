@@ -9,7 +9,7 @@ class HeaderEnsalamento extends StatelessWidget {
 
   Future<void> _logout(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Limpa nome salvo
+    await prefs.clear();
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const TelaLogin()),
