@@ -153,12 +153,12 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
       body: _carregando
           ? const Center(child: CircularProgressIndicator())
           : salasFiltradas.isEmpty
-              ? Expanded(
-                  child: Stack(
-                    children: [
-                      HeaderEnsalamento(nome: _nomeUsuario),
-                      const SizedBox(height: 10),
-                      Center(
+              ? Column(
+                  children: [
+                    HeaderEnsalamento(nome: _nomeUsuario),
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: Center(
                         child: Text(
                           "Sem Aula Hoje 😎",
                           style: TextStyle(
@@ -168,8 +168,8 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 )
               : Stack(
                   children: [

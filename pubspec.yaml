@@ -12,6 +12,7 @@ dependencies:
   shared_preferences: ^2.5.2
   supabase_flutter: ^2.8.4
   app_links: ^3.4.0
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
@@ -23,3 +24,8 @@ flutter:
   assets:
     - images/logo.png
     - images/logo_verde.png
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "images/sologo.png"
