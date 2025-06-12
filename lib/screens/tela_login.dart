@@ -115,7 +115,6 @@ class _TelaLoginState extends State<TelaLogin> {
   void _alternarModoInfra() {
     setState(() {
       modoInfra = !modoInfra;
-      nomeController.clear();
       codigoController.clear();
     });
   }

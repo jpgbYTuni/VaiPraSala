@@ -17,47 +17,25 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
   List<Map<String, dynamic>> salas = [];
   String _cursoSelecionado = "Todos";
   String _nomeUsuario = "Carregando...";
-  String _tipoUsuario = "";
-  int? _idUsuario;
   bool _mostrarFiltro = false;
   bool _carregando = true;
 
   @override
   void initState() {
     super.initState();
-    _recuperarDadosUsuario();
+    _recuperarNome();
+    _carregarSalas();
   }
 
-  Future<void> _recuperarDadosUsuario() async {
+  Future<void> _recuperarNome() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String nome = prefs.getString('nomeUsuario') ?? "Usuário";
-    String tipo = prefs.getString('tipoUsuario') ?? "";
     setState(() {
-      _nomeUsuario = nome;
-      _tipoUsuario = tipo;
+      _nomeUsuario = prefs.getString('nomeUsuario') ?? "Usuário";
     });
-    await _carregarSalas(nome);
   }
 
-  Future<void> _carregarSalas(String nomeUsuario) async {
+  Future<void> _carregarSalas() async {
     try {
-      final usuario = await supabase
-          .from('Usuarios')
-          .select('Codigo')
-          .eq('Nome', nomeUsuario)
-          .maybeSingle();
-
-      if (usuario == null) {
-        setState(() {
-          salas = [];
-          _carregando = false;
-        });
-        return;
-      }
-
-      final codigoUsuario = usuario['Codigo'];
-      _idUsuario = codigoUsuario;
-
       final ensalamentos = await supabase.from('Ensalamento').select();
       final turmas = await supabase.from('Turmas').select();
       final cursos = await supabase.from('Cursos').select();
@@ -66,14 +44,6 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
       final List<Map<String, dynamic>> data = [];
 
       for (final ensalamento in ensalamentos) {
-        if (_tipoUsuario == 'Professor') {
-          final prof1 = ensalamento['codigo_usuario_prof1']?.toString();
-          final prof2 = ensalamento['codigo_usuario_prof2']?.toString();
-          final idUsuarioStr = _idUsuario?.toString();
-
-          if (prof1 != idUsuarioStr && prof2 != idUsuarioStr) continue;
-        }
-
         final turma1 = turmas.firstWhere(
           (t) =>
               t['ID_turma'].toString() == ensalamento['id_turma1'].toString(),
@@ -152,62 +122,85 @@ class _TelaEnsalamentoState extends State<TelaEnsalamento> {
     return Scaffold(
       body: _carregando
           ? const Center(child: CircularProgressIndicator())
-          : salasFiltradas.isEmpty
-              ? Column(
+          : Stack(
+              children: [
+                Column(
                   children: [
                     HeaderEnsalamento(nome: _nomeUsuario),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: PesquisaCurso(
+                        cursos: cursosDisponiveis.toSet().toList(),
+                        onCursoSelecionado: (curso) {
+                          setState(() {
+                            _cursoSelecionado = curso ?? "Todos";
+                          });
+                        },
+                        onAbrirFiltro: () {
+                          setState(() {
+                            _mostrarFiltro = !_mostrarFiltro;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 10),
                     Expanded(
-                      child: Center(
-                        child: Text(
-                          "Sem Aula Hoje 😎",
-                          style: TextStyle(
-                            fontSize: 24,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w500,
+                      child: ListView(
+                        children: salasFiltradas.map((sala) {
+                          return BoxCurso(
+                            title: sala["sala"],
+                            cursos: List<String>.from(sala["turmas"]),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
+                if (_mostrarFiltro)
+                  Positioned.fill(
+                    top: 130,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _mostrarFiltro = false;
+                        });
+                      },
+                      child: Container(
+                        color: Colors.black54,
+                        child: Center(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            width: 300,
+                            height: 300,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: ListView(
+                              children: cursosDisponiveis
+                                  .toSet()
+                                  .toList()
+                                  .map((curso) {
+                                return ListTile(
+                                  title: Text(curso),
+                                  onTap: () {
+                                    setState(() {
+                                      _cursoSelecionado = curso;
+                                      _mostrarFiltro = false;
+                                    });
+                                  },
+                                );
+                              }).toList(),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ],
-                )
-              : Stack(
-                  children: [
-                    Column(
-                      children: [
-                        HeaderEnsalamento(nome: _nomeUsuario),
-                        const SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: PesquisaCurso(
-                            cursos: cursosDisponiveis.toSet().toList(),
-                            onCursoSelecionado: (curso) {
-                              setState(() {
-                                _cursoSelecionado = curso ?? "Todos";
-                              });
-                            },
-                            onAbrirFiltro: () {
-                              setState(() {
-                                _mostrarFiltro = !_mostrarFiltro;
-                              });
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Expanded(
-                          child: ListView(
-                            children: salasFiltradas.map((sala) {
-                              return BoxCurso(
-                                title: sala["sala"],
-                                cursos: List<String>.from(sala["turmas"]),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+              ],
+            ),
     );
   }
 }
